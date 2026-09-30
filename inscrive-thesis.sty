@@ -1,0 +1,115 @@
+% =====================================================================
+%  inscrive-thesis.sty  -  styling for the Inscrive thesis template
+%  ---------------------------------------------------------------
+%  All visual styling lives here. The content files under chapters/
+%  and frontmatter/ never touch layout. Compile main.tex with
+%  pdfLaTeX (or LuaLaTeX/XeLaTeX) and biber.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{inscrive-thesis}[2026/06/20 Inscrive thesis style]
+
+% ---- Colour palette (edit these to rebrand) ------------------------
+\RequirePackage{xcolor}
+\definecolor{accent}{HTML}{4C3A6E}   % muted violet
+\definecolor{ink}{HTML}{1B1B1F}      % near-black text
+\definecolor{muted}{HTML}{8A8693}    % grey metadata
+\definecolor{rule}{HTML}{E3E0E8}     % hairline grey
+
+% ---- Typography ----------------------------------------------------
+% Libertinus serif body + matching maths, Fira Sans for headings,
+% Inconsolata for code. Self-healing fallbacks keep it compiling.
+\IfFileExists{libertinus.sty}{\RequirePackage{libertinus}}{\RequirePackage{mathpazo}}
+\IfFileExists{FiraSans.sty}{\RequirePackage[scaled=0.94]{FiraSans}}{\RequirePackage{helvet}}
+\IfFileExists{inconsolata.sty}{\RequirePackage[varqu,scaled=0.95]{inconsolata}}{}
+\RequirePackage{microtype}
+\newcommand*{\headfont}{\sffamily}
+
+% ---- Page geometry & spacing ---------------------------------------
+\RequirePackage[a4paper,top=2.6cm,bottom=2.6cm,inner=3.1cm,outer=2.6cm]{geometry}
+\RequirePackage{setspace}\onehalfspacing
+\RequirePackage{emptypage}            % no headers on truly empty pages
+
+% ---- Core packages -------------------------------------------------
+\RequirePackage{graphicx}
+\graphicspath{{figures/}}             % so \includegraphics{name} just works
+\RequirePackage{booktabs}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt}
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+\RequirePackage[font=small,labelfont={bf,sf},labelsep=period]{caption}
+
+% ---- Chapter & section styling (modern, ghosted numbers) -----------
+\RequirePackage{titlesec}
+\titleformat{\chapter}[display]
+  {\headfont}
+  {\hfill\fontsize{84}{84}\selectfont\bfseries\color{accent!22}\thechapter}
+  {-26pt}
+  {\Huge\bfseries\color{ink}}
+  [\vspace{6pt}{\color{accent}\rule{\textwidth}{1.2pt}}]
+\titlespacing*{\chapter}{0pt}{6pt}{28pt}
+
+\titleformat{\section}{\headfont\Large\bfseries\color{ink}}{\color{accent}\thesection}{0.6em}{}
+\titleformat{\subsection}{\headfont\large\bfseries\color{ink}}{\color{accent}\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.4em}{0.5em}
+
+% ---- Running heads --------------------------------------------------
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter\quad #1}{}}
+\fancyhead[LE]{\small\headfont\color{muted}\thepage}
+\fancyhead[RE]{\small\headfont\color{muted}\nouppercase{\leftmark}}
+\fancyhead[RO]{\small\headfont\color{muted}\thepage}
+\fancyhead[LO]{\small\headfont\color{muted}\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}}
+
+% ---- Links & references --------------------------------------------
+\RequirePackage[hidelinks]{hyperref}
+\hypersetup{colorlinks=true,linkcolor=accent,citecolor=accent,urlcolor=accent}
+
+% ---- Bibliography (biblatex + biber) -------------------------------
+\IfFileExists{biblatex.sty}{%
+  \RequirePackage[backend=biber,style=numeric-comp,sorting=none,giveninits=true]{biblatex}}{}
+
+% ---- Thesis metadata commands --------------------------------------
+\newcommand{\@subtitle}{}\newcommand{\subtitle}[1]{\renewcommand{\@subtitle}{#1}}
+\newcommand{\@degree}{}\newcommand{\degree}[1]{\renewcommand{\@degree}{#1}}
+\newcommand{\@department}{}\newcommand{\department}[1]{\renewcommand{\@department}{#1}}
+\newcommand{\@university}{}\newcommand{\university}[1]{\renewcommand{\@university}{#1}}
+\newcommand{\@supervisor}{}\newcommand{\supervisor}[1]{\renewcommand{\@supervisor}{#1}}
+
+% ---- The cover: minimalist, left accent bar, generous whitespace ---
+\newcommand{\trackedcaps}[1]{{\headfont\footnotesize\textls[180]{\MakeUppercase{#1}}}}
+\newcommand{\makecover}{%
+  \begin{titlepage}
+    \thispagestyle{empty}
+    % left-edge accent bar, drawn full height
+    \begin{tikzpicture}[remember picture,overlay]
+      \fill[accent] ([xshift=2.0cm,yshift=0cm]current page.north west)
+        rectangle ([xshift=2.18cm,yshift=0cm]current page.south west);
+    \end{tikzpicture}%
+    \vspace*{1.5cm}\par
+    \trackedcaps{\@university}\\[2pt]
+    {\headfont\footnotesize\color{muted}\textls[180]{\MakeUppercase{\@department}}}
+    \vspace{4.2cm}\par
+    {\color{accent}\rule{1.4cm}{3pt}}\\[1.0cm]
+    {\headfont\bfseries\fontsize{34}{40}\selectfont\color{ink}\@title\par}
+    \ifx\@subtitle\empty\else\vspace{0.5cm}{\headfont\Large\color{muted}\@subtitle\par}\fi
+    \vspace{1.2cm}
+    {\large\itshape\@author\par}
+    \vfill
+    \begin{flushleft}\setstretch{1.4}
+      \trackedcaps{\@degree}\\[6pt]
+      {\headfont\footnotesize\color{muted}Supervisor:\ \@supervisor}\\
+      {\headfont\footnotesize\color{muted}\@date}
+    \end{flushleft}
+    \vspace{0.5cm}
+  \end{titlepage}}
+
+% ---- An unnumbered front-matter chapter that still styles nicely ---
+\newcommand{\frontchapter}[1]{%
+  \chapter*{#1}\addcontentsline{toc}{chapter}{#1}%
+  \markboth{#1}{}}
+\endinput

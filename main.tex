@@ -1,0 +1,49 @@
+% =====================================================================
+%  Inscrive Thesis Template  -  main.tex
+%  ---------------------------------------------------------------
+%  This file only orchestrates: it loads the style, sets metadata and
+%  includes content. All styling lives in inscrive-thesis.sty; all
+%  prose lives in frontmatter/ and chapters/.
+%
+%  Build:  pdflatex main  ->  biber main  ->  pdflatex main x2
+%          (or just press recompile in Inscrive)
+% =====================================================================
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage{inscrive-thesis}
+
+% ---- Bibliography database -----------------------------------------
+\addbibresource{references.bib}
+
+% ---- Metadata -------------------------------------------------------
+\title{A Thesis Template\\Worth Building On}
+\subtitle{A structured, restyled starting point}
+\author{Jane Q. Researcher}
+\degree{Master of Science in Computer Science}
+\department{Department of Computer Science}
+\university{Example University}
+\supervisor{Prof.\ A.\ Supervisor}
+\date{June 2026}
+
+\begin{document}
+
+% ---- Cover ----------------------------------------------------------
+\input{frontmatter/titlepage}
+
+% ---- Front matter (roman numerals) ---------------------------------
+\pagenumbering{roman}
+\input{frontmatter/abstract}
+\input{frontmatter/acknowledgements}
+\tableofcontents
+\listoffigures
+
+% ---- Main matter (arabic numerals) ---------------------------------
+\cleardoublepage
+\pagenumbering{arabic}
+\input{chapters/01-introduction}
+\input{chapters/02-method}
+\input{chapters/03-conclusion}
+
+% ---- Back matter ----------------------------------------------------
+\printbibliography[heading=bibintoc]
+
+\end{document}
